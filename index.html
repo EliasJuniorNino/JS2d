@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="myCanvas" width="800" height="600" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+<script>
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+
+    class Linha {
+        constructor(x1, y1, x2, y2){
+            this.x1 = x1
+            this.y1 = y1
+            this.x2 = x2
+            this.y2 = y2
+        }
+        draw(){
+            ctx.moveTo(this.y1, this.x1);
+            ctx.lineTo(this.y2, this.x2);
+            ctx.stroke();
+        }
+    }
+
+    class Bola {
+        constructor(x, y, len){
+            this.x = x
+            this.y = x
+            this.len = len
+            this.raio = Math.PI * 2
+        }
+        draw(){
+            ctx.beginPath()
+            ctx.arc(this.x, this.y, this.len, this.raio, 0)
+            ctx.stroke();
+            ctx.fill()
+        }
+    }
+
+    class Container {
+        constructor(){
+            this.indices = []
+            this.objetos = []
+        }
+
+        add(nome, elemento){
+            if (this.indices.includes(nome)){
+                console.error(`Não foi possivel adicionar o elemento '${nome}', já existe um elemento com esse nome`)
+                return
+            }
+            this.objetos.push(elemento)
+            this.indices.push(nome)
+        }
+
+        get(nome){
+            for(let i = 0; i < this.objetos.length; i++){
+                if (nome === this.indices[i]){
+                    return this.objetos[i]
+                }
+            }
+        }
+    }
+
+    let container = new Container()
+
+    container.add('Linha1', new Linha(c.height, 0, c.height, c.width))
+    container.add('Linha2', new Linha(c.height - 50, 0, c.height - 50, c.width))
+    container.add('Bola1', new Bola(400, 0, 20))
+    container.add('Bola2', new Bola(400, 0, 20))
+    container.add('Bola1', new Bola(400, 0, 20)) // deve dar um erro
+
+    setInterval(() => {
+        let bola = container.get('Bola1')
+        if (bola.x > c.width)
+            bola.x = 0
+        else
+            bola.x++
+    }, 20)
+
+    setInterval(() => {
+        let bola = container.get('Bola2')
+        if (bola.x < 0)
+            bola.x = c.width
+        else
+            bola.x--
+    }, 10)
+    
+    function onDraw() {
+        ctx.clearRect(0, 0, c.width, c.height)
+        for(obj of container.objetos)
+            obj.draw()
+        requestAnimationFrame(onDraw)
+    }
+    requestAnimationFrame(onDraw)
+</script>
+
+</body>
+</html>
